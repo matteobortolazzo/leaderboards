@@ -1,45 +1,26 @@
-﻿using System.ComponentModel;
-using Spectre.Console;
+﻿using Leaderboards.Cli.Commands;
+using Leaderboards.Cli.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 
-var app = new CommandApp<FileSizeCommand>();
-return app.Run(args);
+var registrations = new ServiceCollection();
+registrations.AddHttpClient();
 
-internal sealed class FileSizeCommand : Command<FileSizeCommand.Settings>
+// Create a type registrar and register any dependencies.
+// A type registrar is an adapter for a DI framework.
+var registrar = new TypeRegistrar(registrations);
+
+var app = new CommandApp(registrar);
+app.Configure(config =>
 {
-    public sealed class Settings : CommandSettings
+    config.AddBranch("room", room =>
     {
-        [Description("Path to search. Defaults to current directory.")]
-        [CommandArgument(0, "[searchPath]")]
-        public string? SearchPath { get; init; }
+        room.AddCommand<RoomCreateCommand>("create");
 
-        [CommandOption("-p|--pattern")]
-        public string? SearchPattern { get; init; }
-
-        [CommandOption("--hidden")]
-        [DefaultValue(true)]
-        public bool IncludeHidden { get; init; }
-    }
-
-    public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
-    {
-        var searchOptions = new EnumerationOptions
+        room.AddBranch("quiz", quiz =>
         {
-            AttributesToSkip = settings.IncludeHidden
-                ? FileAttributes.Hidden | FileAttributes.System
-                : FileAttributes.System
-        };
-
-        var searchPattern = settings.SearchPattern ?? "*.*";
-        var searchPath = settings.SearchPath ?? Directory.GetCurrentDirectory();
-        var files = new DirectoryInfo(searchPath)
-            .GetFiles(searchPattern, searchOptions);
-
-        var totalFileSize = files
-            .Sum(fileInfo => fileInfo.Length);
-
-        AnsiConsole.MarkupLine($"Total file size for [green]{searchPattern}[/] files in [green]{searchPath}[/]: [blue]{totalFileSize:N0}[/] bytes");
-
-        return 0;
-    }
-}
+            quiz.AddCommand<RoomQuizAddCommand>("add");
+        });
+    });
+});
+return app.Run(args);
