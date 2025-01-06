@@ -1,24 +1,62 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
+"use client"
 
-function HomePage() {
-  const [room, setRoom] = useState<string>('')
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+
+import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+
+const FormSchema = z.object({
+  room: z.string().min(4, {
+    message: "Room must be at least 4 characters.",
+  }),
+})
+
+export interface HomePageProps {
+  onRoomJoin: (roomId: string) => void;
+}
+
+export function HomePage({ onRoomJoin: onRoom }: HomePageProps) {
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      room: "",
+    },
+  })
+
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    onRoom(data.room);
+  }
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="room">Room</Label>
-        <Input name="room" type="text"
-          value={room}
-          onChange={e => setRoom(e.target.value)}>
-        </Input>
-      </div>
-      <Button disabled={room.length < 4}>Join</Button>
-    </section>
-  );
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="room"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Room</FormLabel>
+              <FormControl>
+                <Input placeholder="room-code" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Join</Button>
+      </form>
+    </Form>
+  )
 }
 
 export default HomePage;
-

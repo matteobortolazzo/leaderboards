@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { useEffect, useState } from "react"
 
 const FormSchema = z.object({
   type: z.string({
@@ -28,18 +29,41 @@ const answers = [
   "A cloud-based technology for hosting applications without the need for infrastructure management."
 ];
 
-export function QuizPage() {
+export interface QuizPageProps {
+  onAnswer: (answerIndex: number) => void;
+}
+
+export function QuizPage({ onAnswer }: QuizPageProps) {
+  const [time, setTime] = useState(10);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTime(currentTime => {
+        if (currentTime <= 0) {
+          clearTimeout(timer);
+          onAnswer(-1);
+          return 0;
+        }
+        return currentTime - 1;
+      });
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  });
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-  })
+  });
+
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data);
+    onAnswer(+data.type);
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+      {time > 0 && <p className="text-xl font-bold py-2">{time}s</p>}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="type"
