@@ -42,8 +42,8 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_SKY_0C3E75503 }}
           action: "upload"
           skip_app_build: true
-          app_location: "src/leaderboards-app"
-          output_location: "dist"
+          app_location: "dist"
+          output_location: "leaderboards/dist"
 
   deploy_prod_job:
     runs-on: ubuntu-latest
@@ -61,5 +61,4 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_SKY_0C3E75503 }}
           action: "upload"
           skip_app_build: true
-          app_location: "src/leaderboards-app"
-          output_location: "dist"
+          output_location: "leaderboards/dist"
