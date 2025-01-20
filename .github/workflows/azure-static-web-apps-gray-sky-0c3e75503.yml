@@ -25,7 +25,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: ${{ env.GITHUB_WORKSPACE }}/src/leaderboards-app/dist
+          path: ${{ github.workspace }}/src/leaderboards-app/dist
 
   deploy_test_job:
     runs-on: ubuntu-latest
