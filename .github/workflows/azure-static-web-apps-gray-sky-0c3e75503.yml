@@ -18,14 +18,15 @@ jobs:
           node-version: '22'
       - run: npm install --global yarn
         name: 'Setup Yarn'
-      - run: yarn install leaderboards/src/leaderboards-app
+      - run: cd leaderboards/src/leaderboards-app 
+      - run: yarn
         name: 'Install Dependencies'
-      - run: yarn build leaderboards/src/leaderboards-app
+      - run: yarn build
         name: 'Build'
       - uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: leaderboards/src/leaderboards-app/dist
+          path: dist
 
   deploy_test_job:
     runs-on: ubuntu-latest
