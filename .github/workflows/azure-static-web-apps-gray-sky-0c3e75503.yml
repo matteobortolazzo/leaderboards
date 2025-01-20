@@ -18,7 +18,7 @@ jobs:
           node-version: '22'
       - run: npm install --global yarn
         name: 'Setup Yarn'
-      - run: cd $GITHUB_WORKSPACE/leaderboards/src/leaderboards-app 
+      - run: cd $GITHUB_WORKSPACE/src/leaderboards-app 
       - run: yarn
         name: 'Install Dependencies'
       - run: yarn build
